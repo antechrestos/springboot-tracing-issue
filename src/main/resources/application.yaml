@@ -1,0 +1,25 @@
+spring:
+  reactor:
+    context-propagation: auto
+  data:
+    mongodb:
+      uri: "mongodb://local-user:local-pass@localhost:27017/tracing-issue"
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  tracing:
+    sampling:
+      probability: 1
+    enabled: true
+  otlp:
+    metrics:
+      export:
+        enabled: true
+        url: http://localhost:4318/v1/metrics
+    tracing:
+      endpoint: http://localhost:4318/v1/traces
+
+
+
