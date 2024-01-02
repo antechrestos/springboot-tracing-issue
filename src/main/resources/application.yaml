@@ -3,7 +3,7 @@ spring:
     context-propagation: auto
   data:
     mongodb:
-      uri: "mongodb://local-user:local-pass@localhost:27017/tracing-issue"
+      uri: "mongodb://localhost:27017/tracing-issue"
 management:
   endpoints:
     web:

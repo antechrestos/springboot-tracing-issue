@@ -1,23 +1,13 @@
 services:
   mongo:
-    image: bitnami/mongodb:5.0
-    environment:
-      # see configuration here:
-      # https://github.com/bitnami/containers/tree/main/bitnami/mongodb#setting-up-replication
-      - MONGODB_REPLICA_SET_MODE=primary
-      - MONGODB_ROOT_PASSWORD=${MONGODB_PASSWORD}
-      - MONGODB_USERNAME=${MONGODB_USERNAME}
-      - MONGODB_PASSWORD=${MONGODB_PASSWORD}
-      - MONGODB_REPLICA_SET_KEY=replicasetkey123
-      - MONGODB_DATABASE=${MONGODB_DATABASE_NAME}
+    image: mongo:7
+
     ports:
       - "27017:27017"
     volumes:
       - mongo-data:/data/db
     networks:
       - tracing-issue
-    healthcheck:
-      test: [ "CMD", "mongosh", "-p", "${MONGODB_PASSWORD}", "-u", "root", "--eval", "'db.getReplicationInfo()'" ]
 
   monitoring-grafana:
     image: grafana/grafana-oss:9.3.2
