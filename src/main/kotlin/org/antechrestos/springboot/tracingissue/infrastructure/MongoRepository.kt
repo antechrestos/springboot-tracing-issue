@@ -14,11 +14,14 @@ class MongoRepository(private val mongoStore: UserRepositoryMongoStore) : UserRe
 
     override suspend fun create(user: User) =
         mongoStore.save(
-            DBUser(
-                id = user.id,
-                firstname = user.firstname,
-                name = user.name
-            )
+            user.also { logger.debug("about to create {}", it) }
+                .let {
+                    DBUser(
+                        id = it.id,
+                        firstname = it.firstname,
+                        name = it.name
+                    )
+                }
         )
             .let { toDomain(it) }
             .also { logger.debug("user created {}", it) }
@@ -26,15 +29,16 @@ class MongoRepository(private val mongoStore: UserRepositoryMongoStore) : UserRe
     override fun list() = mongoStore.findAll().map { toDomain(it) }
 
 
-    override suspend fun get(id: String) = mongoStore.findById(id)
+    override suspend fun get(id: String) = mongoStore.findById(id.also { logger.debug("loading with id {}", it) })
         ?.let { toDomain(it) }
         ?.also {
-            logger.debug("user created {}", it)
+            logger.debug("user retrieved {}", it)
         }
 
     override suspend fun delete(id: String) {
-        mongoStore.deleteById(id)
-        logger.debug("user deleted {}", id)
+        mongoStore.deleteById(id.also { logger.debug("deleting with id {}", id) })
+            .also { logger.debug("user deleted {}", id) }
+
     }
 
     private fun toDomain(it: DBUser) = User(
