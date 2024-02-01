@@ -4,6 +4,7 @@ import io.micrometer.core.instrument.kotlin.asContextElement
 import io.micrometer.observation.ObservationRegistry
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.info.Info
+import kotlinx.coroutines.slf4j.MDCContext
 import kotlinx.coroutines.withContext
 import org.antechrestos.springboot.tracingissue.infrastructure.UserRepositoryMongoStore
 import org.springframework.boot.autoconfigure.SpringBootApplication
@@ -33,8 +34,14 @@ class TracingIssueApplication {
     @Bean
     fun coroutineContextFilter(observationRegistry: ObservationRegistry): CoWebFilter = object : CoWebFilter() {
         override suspend fun filter(exchange: ServerWebExchange, chain: CoWebFilterChain) {
-            withContext(observationRegistry.asContextElement()){
-                chain.filter(exchange)
+            when(exchange.request.uri.path) {
+                "/api/v1/users-without-context" -> chain.filter(exchange)
+                "/api/v1/users-with-mdc" -> withContext(MDCContext()){
+                    chain.filter(exchange)
+                }
+                else -> withContext(observationRegistry.asContextElement()){
+                    chain.filter(exchange)
+                }
             }
         }
     }

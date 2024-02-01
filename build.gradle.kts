@@ -34,6 +34,8 @@ dependencies {
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactive")
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
+	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-slf4j")
+
 
 	implementation("io.micrometer:micrometer-tracing-bridge-otel")
 	runtimeOnly("io.micrometer:micrometer-registry-otlp")
@@ -57,4 +59,11 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+}
+
+tasks.bootBuildImage {
+	buildpacks = listOf(
+		"gcr.io/paketo-buildpacks/java:latest",
+		"gcr.io/paketo-buildpacks/amazon-corretto:latest",
+	)
 }
